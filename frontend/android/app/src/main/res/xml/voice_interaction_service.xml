@@ -1,0 +1,9 @@
+<voice-interaction-service
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sessionService="com.bernardhwang.frontend.VoiceInteractionSessionService"
+    android:recognitionService="com.bernardhwang.frontend.RecognitionService"
+    android:settingsActivity="com.bernardhwang.frontend.MainActivity" 
+    android:supportsAssist="true"
+    android:supportsLaunchVoiceAssistFromKeyguard="true"
+    android:supportsLocalInteraction="true"
+/>

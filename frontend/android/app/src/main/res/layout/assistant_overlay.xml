@@ -1,0 +1,25 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/assistant_overlay"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_bg"
+    android:padding="24dp"
+    android:elevation="10dp">
+
+    <ImageView
+        android:id="@+id/mic_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_mic"
+        android:tint="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/assistant_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Listening..."
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:paddingTop="12dp"/>
+</LinearLayout>
