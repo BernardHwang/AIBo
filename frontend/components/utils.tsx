@@ -1,6 +1,6 @@
 export const lightTheme = {
-  background: '#f2f2f2',
-  text: '#000000',
+  background: '#000000',
+  text: '#0e0f0c',
 };
 
 export const darkTheme = {
@@ -13,3 +13,7 @@ export type ThemeContextType = {
   mode: 'light' | 'dark';
   toggleTheme: () => void;
 };
+
+export const lightColorCode = "#9fe870"
+
+export const darkColorCode = "#163300"
