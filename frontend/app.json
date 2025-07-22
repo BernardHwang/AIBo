@@ -5,7 +5,7 @@
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/images/logo.png",
-        "scheme": "AIBo",
+        "scheme": "com.aibo.app",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
         "ios": {
@@ -17,7 +17,7 @@
                 "backgroundColor": "#ffffff"
             },
             "edgeToEdgeEnabled": true,
-            "package": "com.bernardhwang.frontend"
+            "package": "com.aibo.app"
         },
         "web": {
             "bundler": "metro",

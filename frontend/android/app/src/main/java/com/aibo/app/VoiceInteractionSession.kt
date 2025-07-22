@@ -1,4 +1,4 @@
-package com.bernardhwang.frontend // Ensure this package is correct based on your file structure
+package com.aibo.app // Ensure this package is correct based on your file structure
 
 import android.content.Context
 import android.os.Bundle
@@ -11,7 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 
-import com.bernardhwang.frontend.R // Make sure this R is correct for your project
+import com.aibo.app.R // Make sure this R is correct for your project
 
 class VoiceInteractionSession(context: Context) : VoiceInteractionSession(context) {
 

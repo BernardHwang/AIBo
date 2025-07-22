@@ -1,4 +1,4 @@
-package com.bernardhwang.frontend
+package com.aibo.app
 
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession

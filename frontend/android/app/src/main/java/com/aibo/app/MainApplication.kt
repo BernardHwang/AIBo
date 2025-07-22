@@ -1,4 +1,4 @@
-package com.bernardhwang.frontend
+package com.aibo.app
 
 import android.app.Application
 import android.content.res.Configuration
