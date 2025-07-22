@@ -37,19 +37,33 @@ const LoginLanding = () => {
                 </Text>
             </View>
             <Image
-                source={require('@/assets/images/logo.png')}
-                style={{ width: 300, height: 300, alignItems: 'center', justifyContent: "center"}}
+                source={require("@/assets/images/logo.png")}
+                style={{
+                    width: 300,
+                    height: 300,
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
             />
             <Pressable
-                onPress={() => router.navigate('/login/google')}
+                onPress={() => router.navigate("/login/google")}
                 style={{
-                    backgroundColor: mode === "dark" ? lightColorCode : darkColorCode,
+                    backgroundColor:
+                        mode === "dark" ? lightColorCode : darkColorCode,
                     paddingVertical: 25,
                     paddingHorizontal: 100,
-                    borderRadius: 100
+                    borderRadius: 100,
                 }}
             >
-                <Text style={{ color: mode === "dark" ? darkColorCode : lightColorCode, fontFamily: "Inter_800ExtraBold", fontSize: 26 }}>Let's Start</Text>
+                <Text
+                    style={{
+                        color: mode === "dark" ? darkColorCode : lightColorCode,
+                        fontFamily: "Inter_800ExtraBold",
+                        fontSize: 26,
+                    }}
+                >
+                    Let's Start
+                </Text>
             </Pressable>
         </View>
     );

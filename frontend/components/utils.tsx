@@ -17,3 +17,8 @@ export type ThemeContextType = {
 export const lightColorCode = "#9fe870"
 
 export const darkColorCode = "#163300"
+
+export const googleBlue = "#4285F4"
+export const googleRed = "#DB4437"
+export const googleYellow = "#F4B400"
+export const googleGreen = "#0F9D58"
