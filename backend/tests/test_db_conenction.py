@@ -1,5 +1,5 @@
 import pytest
-from db.mongo_client import db
+from shared.db.mongo_client import db
 
 # Test MongoDB connection
 @pytest.mark.asyncio
