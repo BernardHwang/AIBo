@@ -5,7 +5,7 @@ import * as Google from "expo-auth-session/providers/google";
 import * as AuthSession from "expo-auth-session";
 import { useRouter } from "expo-router";
 import { useAppTheme } from "@/components/ThemeContext";
-import * as WebBrowser from 'expo-web-browser';
+import * as WebBrowser from "expo-web-browser";
 import {
     darkColorCode,
     lightColorCode,
@@ -14,23 +14,24 @@ import {
     googleYellow,
     googleGreen,
 } from "@/components/utils";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // @ts-ignore
-import { GOOGLE_ANDROID_CLIENT_ID } from "@env";
+import { GOOGLE_ANDROID_CLIENT_ID, LOGIN_SERVICE_API_URL } from "@env";
 
-WebBrowser.maybeCompleteAuthSession(); 
+WebBrowser.maybeCompleteAuthSession();
 
 const GoogleLogin = () => {
-    
     const router = useRouter();
     const { theme, mode }: any = useAppTheme();
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: GOOGLE_ANDROID_CLIENT_ID,
         redirectUri: AuthSession.makeRedirectUri({
-            scheme: 'com.aibo.app',
-            path: 'login/whatsapp',
-            isTripleSlashed: true
+            scheme: "com.aibo.app",
+            path: "login/google",
+            isTripleSlashed: true,
         }),
     });
 
@@ -39,17 +40,33 @@ const GoogleLogin = () => {
             response?.type === "success" &&
             response.authentication?.accessToken
         ) {
-            getUserInfo(response.authentication.accessToken);
+            const sendToBackend = async () => {
+                try {
+                    const res = await axios.post(
+                        `${LOGIN_SERVICE_API_URL}/user/google/login`,
+                        {
+                            authentication: response.authentication,
+                        }
+                    );
+
+                    const { uuid, email } = res.data;
+
+                    // Save to AsyncStorage
+                    await AsyncStorage.setItem("uuid", uuid);
+                    await AsyncStorage.setItem("email", email);
+
+                    router.navigate("/login/whatsapp")
+                } catch (error) {
+                    console.error(
+                        "Backend login failed:",
+                        (error as any)?.response?.data || (error as Error).message
+                    );
+                }
+            };
+
+            sendToBackend();
         }
     }, [response]);
-
-    async function getUserInfo(token: any) {
-        const res = await fetch("https://www.googleapis.com/userinfo/v2/me", {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        const user = await res.json();
-        console.log(user);
-    }
 
     return (
         <View
@@ -177,7 +194,6 @@ const GoogleLogin = () => {
                     Sign in with Google
                 </Text>
             </Pressable>
-            <StatusBar style="light" />
         </View>
     );
 };

@@ -1,13 +1,12 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
-class UserCreate(BaseModel):
-    uuid: str
+class GoogleUserCreate(BaseModel):
     email: EmailStr
-    phone_num: str
-    password: str  # To hash later
+    name: str
+    picture: str
+    token: str
 
-class UserOut(BaseModel):
-    id: str
-    username: str
-    email: EmailStr
+class WhatsAppUpdate(BaseModel):
+    phone: str
+    whatsapp_verified: bool = True  # optional flag

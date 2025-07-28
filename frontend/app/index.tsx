@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Redirect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { ActivityIndicator, View, Text, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppTheme } from "@/components/ThemeContext";
@@ -10,11 +10,17 @@ const LoadingScreen = () => {
     const { theme }: any = useAppTheme();
 
     useEffect(() => {
-        const checkLogin: () => Promise<void> = async () => {
-            const token = await AsyncStorage.getItem("user_token");
-            await new Promise((resolve) => setTimeout(resolve, 3000)); // Pause for 3 seconds to simulate Loading
-            if (token) {
-                router.navigate("/home"); // Go to home
+        const checkLogin = async () => {
+            const uuid = await AsyncStorage.getItem("uuid");
+            const email = await AsyncStorage.getItem("email");
+            const phone = await AsyncStorage.getItem("phone");
+
+            await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate loading
+
+            if (uuid && email && phone) {
+                router.navigate("/home"); // Logged in and verified
+            } else if (uuid && email) {
+                router.navigate("/login/whatsapp"); // Needs WhatsApp verification
             } else {
                 router.navigate("/login"); // First-time login
             }

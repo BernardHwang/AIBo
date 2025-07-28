@@ -1,48 +1,76 @@
-import os
-from fastapi import APIRouter, Request, Response
-from fastapi.responses import RedirectResponse
-from urllib.parse import urlencode
+from fastapi import APIRouter, HTTPException, Request
 import httpx
-from dotenv import load_dotenv
+from datetime import datetime, timedelta
+import pytz
 
-load_dotenv()
-router = APIRouter(prefix="/oauth", tags=["Google OAuth"])
+from shared.utils import create_uuid
+from shared.db.mongo_client import users
 
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+router = APIRouter(prefix="/user/google", tags=["Google Auth"])
 
-@router.get("/google")
-def google_login():
-    params = {
-        "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": GOOGLE_REDIRECT_URI,
-        "response_type": "code",
-        "scope": "openid email profile https://www.googleapis.com/auth/gmail.send",
-        "access_type": "offline",
-        "prompt": "consent"
-    }
-    url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
-    return RedirectResponse(url)
+@router.post("/login")
+async def google_auth(request: Request):
+    data = await request.json()
+    authentication = data.get("authentication")
 
-@router.get("/google/callback")
-async def google_callback(request: Request):
-    code = request.query_params.get("code")
-    if not code:
-        return Response("No code provided", status_code=400)
+    access_token = authentication.get("accessToken")
+    id_token = authentication.get("idToken")
+    refresh_token = authentication.get("refreshToken")
+    expires_in = authentication.get("expiresIn")
 
-    token_url = "https://oauth2.googleapis.com/token"
-    data = {
-        "code": code,
-        "client_id": GOOGLE_CLIENT_ID,
-        "client_secret": GOOGLE_CLIENT_SECRET,
-        "redirect_uri": GOOGLE_REDIRECT_URI,
-        "grant_type": "authorization_code"
-    }
+    if not access_token:
+        raise HTTPException(status_code=400, detail="Missing access token")
 
-    async with httpx.AsyncClient() as client:
-        token_res = await client.post(token_url, data=data)
-        token_data = token_res.json()
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
 
-    # Save token_data['access_token'], token_data['refresh_token']
-    return token_data
+        if response.status_code != 200:
+            raise HTTPException(status_code=401, detail="Invalid access token")
+
+        profile = response.json()
+        google_id = profile["id"]
+        email = profile["email"]
+        name = profile.get("name")
+        picture = profile.get("picture")
+
+        # Make this async
+        existing_user = await users.find_one({"email": email})
+        if existing_user:
+            user_uuid = existing_user["_id"]
+        else:
+            user_uuid = create_uuid()
+
+        expires_at = datetime.now(tz=pytz.timezone("Asia/Kuala_Lumpur")) + timedelta(seconds=expires_in or 3600)
+
+        # Also async
+        await users.update_one(
+            {"_id": user_uuid},
+            {
+                "$set": {
+                    "email": email,
+                    "google": {
+                        "id": google_id,
+                        "name": name,
+                        "picture": picture,
+                        "access_token": access_token,
+                        "refresh_token": refresh_token,
+                        "id_token": id_token,
+                        "expires_at": expires_at
+                    },
+                    "updated_at": datetime.now(tz=pytz.timezone("Asia/Kuala_Lumpur"))
+                },
+                "$setOnInsert": {
+                    "created_at": datetime.now(tz=pytz.timezone("Asia/Kuala_Lumpur"))
+                }
+            },
+            upsert=True
+        )
+
+        return {"uuid": user_uuid, "email": email}
+
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=500, detail=f"Google request failed: {e}")

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from login_service.api import google_oauth
+from login_service.api import google_oauth, whatsapp_login
 
 app = FastAPI(
     title="Login Service",
@@ -10,6 +10,7 @@ app = FastAPI(
 
 # Register routes
 app.include_router(google_oauth.router)
+app.include_router(whatsapp_login.router)
 
 app.add_middleware(
     CORSMiddleware,
